@@ -1,0 +1,34 @@
+*:not(p *) {
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Secular One', sans-serif;
+}
+
+body {
+    background-color: wheat;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+div {
+    width: 60%;
+    margin: 0 auto;
+    border: 1px solid black;
+    border-radius: 10px;
+    text-align: center;
+    background-color: white;
+    min-height: 35%;
+}
+
+input {
+    width: 25%;
+}
+
+i:hover {
+    color: blue;
+}
+
+/* i {
+    font-family: sans-serif !important;
+} */
