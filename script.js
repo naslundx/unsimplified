@@ -1,7 +1,7 @@
 const datain = document.querySelector("input");
 const dataout = document.querySelector("#result");
 
-// Math functions
+// Inverse functions
 const basel_inv = (n) => {
     return "\\frac{" + (n * 6) + "}{\\pi^2}\\sum_{k=1}^{\\infty}\\frac{1}{k^2}";
 }
@@ -43,6 +43,26 @@ function half_inv(n) {
     return "";
 }
 
+function power_two_inv(n) {
+    if (n && !(n & (n - 1))) {
+        let nlog = Math.log2(n);
+        return "2^{" + nlog + "}";
+    }
+
+    return "";
+}
+
+function euler_inv(n) {
+    return "-" + n + "e^{\\pi \\cdot i}";
+}
+
+// Splitting functions
+
+function split(n) {
+    let i = Math.round(Math.sqrt(n)) - 1;
+// TODO
+}
+
 // UI
 const update = () => {
     if (datain.value.length == 0) {
@@ -52,14 +72,22 @@ const update = () => {
 
     const number = parseInt(datain.value);
 
-    let results = [
-        basel_inv(number),
-        two_three_inv(number),
-        factorial_inv(number),
-        half_inv(number)
-    ].filter(x => x);
+    let functions = [
+        basel_inv,
+        two_three_inv,
+        factorial_inv,
+        half_inv,
+        power_two_inv,
+        euler_inv
+    ]
 
-    console.log(results);
+    let results_full = functions.map(x => x(number)).filter(x => x);
+
+    console.log(results_full);
+
+    // TODO Try to divide the number and print more options
+
+    let results = [...results_full];
 
     const result = results[Math.floor(Math.random() * results.length)]
     dataout.innerText = `$$${result}$$`;

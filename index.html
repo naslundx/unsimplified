@@ -16,13 +16,42 @@
 <body>
     <h1>Oförenklat</h1>
 
-    <div>
-        <p>Varför säga <input type="text" oninput="update()"> när man kan säga...</h2>
+    <div class="content">
+        <p>Varför säga <input type="text" oninput="update()" placeholder="Skriv ett tal!"> när man kan säga...</h2>
         
         <p id="result">(skriv in ett heltal)</p>
 
         <p onclick="update()"><i class="fa fa-refresh"></i></p>
     </div>
+
+    <div class="bounce">
+        <p>Tyckte du om det här?</p> 
+        <p>Då gillar du kanske mina böcker också:</p>
+
+        <div class="bouncecontent">
+            <a href="">
+                <div class="book">
+                    <img src="esao.png">
+                    <p>en summa av ögonblick</p>
+                </div>
+            </a>
+            <a href="">
+                <div class="book">
+                    <img src="vk.jpg">
+                    <p>verklighetens kvadratrötter</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="transition">
+        <p>
+            <a href="https://www.linkedin.com/in/naslundx/">
+                Av Marcus Näslund, officiell sifferälskare
+                <i class="fa fa-address-card-o"></i>
+            </a>
+        </p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
