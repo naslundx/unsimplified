@@ -53,19 +53,22 @@ i:hover {
 
 .bounce {
     position:fixed;
-    left: 65%;
+    left: 80%;
     margin-top:-25px;
     margin-left:-25px;
     background:red;
     animation:bounce 3s infinite;
-    width: 30%;
+    width: 20%;
     background: white;
     font-size: medium;
     padding: 10px;
+    opacity: 33%;
+    transition: opacity 0.5s linear;
 }
 
 .bounce:hover {
     animation-play-state: paused;
+    opacity: 100%;
 }
 
 @keyframes bounce {

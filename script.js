@@ -1,5 +1,9 @@
+// DOM elements
 const datain = document.querySelector("input");
 const dataout = document.querySelector("#result");
+
+// Helper functions
+const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
 
 // Inverse functions
 const basel_inv = (n) => {
@@ -20,7 +24,7 @@ const two_three_inv = (n) => {
     return "";
 }
 
-function factorial_inv(n) {
+const factorial_inv = (n) => {
     let product = 1;
     let i = 1;
         
@@ -34,7 +38,7 @@ function factorial_inv(n) {
     return "";
 }
 
-function half_inv(n) {
+const half_inv = (n) => {
     if (n % 2 == 0) {
         let nhalf = n / 2;
         return "\\lim_{a->0^+}\\int_a^1\\frac{" + nhalf + "dx}{\\sqrt{x}}";
@@ -43,7 +47,7 @@ function half_inv(n) {
     return "";
 }
 
-function power_two_inv(n) {
+const power_two_inv = (n) => {
     if (n && !(n & (n - 1))) {
         let nlog = Math.log2(n);
         return "2^{" + nlog + "}";
@@ -52,15 +56,41 @@ function power_two_inv(n) {
     return "";
 }
 
-function euler_inv(n) {
+const euler_inv = (n) => {
     return "-" + n + "e^{\\pi \\cdot i}";
 }
 
-// Splitting functions
+const all_inv_functions = [
+    basel_inv,
+    two_three_inv,
+    factorial_inv,
+    half_inv,
+    power_two_inv,
+    euler_inv
+]
 
-function split(n) {
-    let i = Math.round(Math.sqrt(n)) - 1;
-// TODO
+// Computation functions
+const compute = (n) => {
+    return all_inv_functions.map(x => x(n)).filter(x => x);
+}
+
+const divided_compute = (n) => {
+    // TODO do this with any factorization
+    // and any number of parts (use random up to log10?)
+
+    // TODO support settings for multiple parts, allowing series, etc.
+
+    if (n < 4) {
+        return [];
+    }
+
+    if (n % 2 == 0) {
+        let halves = compute(n / 2);
+
+        return cartesian(halves, ['+'], halves).map(x => x.join(" "));
+    }
+
+    return [];
 }
 
 // UI
@@ -72,22 +102,13 @@ const update = () => {
 
     const number = parseInt(datain.value);
 
-    let functions = [
-        basel_inv,
-        two_three_inv,
-        factorial_inv,
-        half_inv,
-        power_two_inv,
-        euler_inv
-    ]
+    let results_full = compute(number);
 
-    let results_full = functions.map(x => x(number)).filter(x => x);
+    let results_test = divided_compute(number);
 
-    console.log(results_full);
+    let results = [...results_full, ...results_test];
 
-    // TODO Try to divide the number and print more options
-
-    let results = [...results_full];
+    console.log(results);
 
     const result = results[Math.floor(Math.random() * results.length)]
     dataout.innerText = `$$${result}$$`;
