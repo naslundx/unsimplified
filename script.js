@@ -3,12 +3,14 @@ const datain = document.querySelector("input");
 const dataout = document.querySelector("#result");
 
 // Helper functions
-const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat()))).filter(x => x[0] != x[2]);
 
 // Inverse functions
 const basel_inv = (n) => {
     return "\\frac{" + (n * 6) + "}{\\pi^2}\\sum_{k=1}^{\\infty}\\frac{1}{k^2}";
 }
+
+// TODO add fun trig identities
 
 const two_three_inv = (n) => {
     if (n >= 9 && n % 3 == 0) {
