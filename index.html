@@ -32,10 +32,16 @@
     <h1>Oförenklat</h1>
 
     <div class="content">
-        <p onclick="update()" id="refresh"><i class="fa fa-refresh"></i></p>
-        <p>Varför säga <input type="text" oninput="update()" placeholder="Skriv ett tal!"> när man kan säga...</h2>
+        <div class="icons">
+            <p onclick="update()" class="icon" id="refresh"><i class="fa fa-refresh"></i></p>
+            <p onclick="copy()" class="icon" id="copy"><i class="fa fa-copy"></i></p>
+            <p class="icon" id="wolframalpha"><a href=""><i class="fa fa-external-link-square"></i></a></p>
+        </div>
+        <p>Varför säga <input type="text" oninput="update()" onfocusin="focusin()" onfocusout="focusout()" placeholder="Skriv ett tal!"> när man kan säga...</h2>
         
         <p id="result">(skriv in ett heltal)</p>
+
+        <p id="raw" class="tex2jax_ignore"></p>
 
         <div class="settings">
             <div>
@@ -60,7 +66,7 @@
                     <p>en summa av ögonblick</p>
                 </div>
             </a>
-            <a href="https://naslundx.github.com/kvadratrot">
+            <a href="https://naslundx.github.io/kvadratrot/">
                 <div class="book">
                     <img src="vk.jpg">
                     <p>verklighetens kvadratrötter</p>

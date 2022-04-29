@@ -2,8 +2,12 @@
 const datain = document.querySelector("input");
 const dataout = document.querySelector("#result");
 const refreshbtn = document.querySelector("#refresh");
+const wabtn = document.querySelector("#wolframalpha");
+const copybtn = document.querySelector("#copy");
 const pref_multiple = document.querySelector("#multiterm");
 const pref_complex = document.querySelector("#complex");
+const bounce = document.querySelector(".bounce");
+const raw = document.querySelector("#raw");
 
 // Helper functions
 const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat()))).filter(x => x[0] != x[2]);
@@ -73,7 +77,7 @@ const power_two_inv = (n, prefs) => {
 }
 
 const euler_inv = (n, prefs) => {
-    if (!prefs.complex) {
+    if (!prefs.complex || n < 2) {
         return "";
     }
 
@@ -91,11 +95,15 @@ const tanprod_inv = (n, prefs) => {
 
     let m = (n-1)/2;
 
-    return "\\left( \\prod_{k=1}^{" + m + "} \\frac{k \\pi}{2 \\cdot" + m + " + 1} \\right)^2";
+    return "\\left( \\prod_{k=1}^{" + m + "} \\tan{ \\frac{k \\pi}{2 \\cdot" + m + " + 1}} \\right)^2";
 }
 
 const simpledouble_inv = (n, prefs) => {
     return "\\frac{" + (n * 2) + "}{2}"
+}
+
+const simplethird_inv = (n, prefs) => {
+    return "\\frac{" + (n * 3) + "}{3}"
 }
 
 const all_inv_functions = [
@@ -107,6 +115,7 @@ const all_inv_functions = [
     euler_inv,
     tanprod_inv,
     simpledouble_inv,
+    simplethird_inv,
 ];
 
 // Computation functions
@@ -136,18 +145,33 @@ const compute = (number, parts, prefs) => {
 }
 
 // UI
+const focusin = () => {
+    bounce.classList.add("hidden");
+    setTimeout(focusout, 10000);
+}
+
+const focusout = () => {
+    bounce.classList.remove("hidden");
+}
+
 const update = () => {
     refreshbtn.classList.remove("visible");
+    wabtn.classList.remove("visible");
+    copybtn.classList.remove("visible");
 
     if (datain.value.length == 0) {
-        dataout.innerText = "";
+        dataout.innerText = "-";
         return;
     }
 
-    const number = parseInt(datain.value);
+    const number = parseInt(datain.value.trim());
 
-    if (number < 1) {
+    console.log(number);
+    console.log(isNaN(number));
+
+    if (isNaN(number) || number < 1) {
         dataout.innerText = "Bara positiva heltal (än så länge)";
+        return;
     }
 
     let prefs = {
@@ -156,9 +180,40 @@ const update = () => {
     }
 
     console.log(prefs);
-
     const result = compute(number, 3, prefs);
+    wabtn.childNodes[0].href = "https://www.wolframalpha.com/input?i=" + encodeURIComponent(result);
     dataout.innerText = `$$${result}$$`;
     refreshbtn.classList.add("visible");
+    copybtn.classList.add("visible");
+    wabtn.classList.add("visible");
+    raw.innerText = result;
+    console.log(result);
     MathJax.typeset();
 }
+
+const copy = () => {
+    let copyText = document.createElement("input");
+    copyText.type = "text";
+    copyText.value = raw.innerText;
+
+    /* Select the text field */
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /* For mobile devices */
+    
+        /* Copy the text inside the text field */
+    navigator.clipboard.writeText(copyText.value);
+    
+    /* Alert the copied text */
+    alert("Copied the text: " + copyText.value);
+}
+
+// Search
+const searchFromUrl = () => {
+    let searchterm = new URLSearchParams(window.location.search).get("q");
+    if (searchterm) {
+        datain.value = searchterm;
+        update();
+    }
+}
+
+window.addEventListener('load', searchFromUrl);
