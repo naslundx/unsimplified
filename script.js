@@ -4,6 +4,7 @@ const dataout = document.querySelector("#result");
 
 // Helper functions
 const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat()))).filter(x => x[0] != x[2]);
+const randint = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 // Inverse functions
 const basel_inv = (n) => {
@@ -59,7 +60,17 @@ const power_two_inv = (n) => {
 }
 
 const euler_inv = (n) => {
-    return "-" + n + "e^{\\pi \\cdot i}";
+    return "\\frac{" + n + "e^{\\pi \\cdot i}}{i^2}";
+}
+
+const tanprod_inv = (n) => {
+    if (n % 2 == 0) {
+        return "";
+    }
+
+    let m = (n-1)/2;
+
+    return "\\left( \\prod_{k=1}^{" + m + "} \\frac{k \\pi}{2 \\cdot" + m + " + 1} \\right)^2";
 }
 
 const all_inv_functions = [
@@ -68,31 +79,30 @@ const all_inv_functions = [
     factorial_inv,
     half_inv,
     power_two_inv,
-    euler_inv
-]
+    euler_inv,
+    tanprod_inv
+];
 
 // Computation functions
-const compute = (n) => {
-    return all_inv_functions.map(x => x(n)).filter(x => x);
+const _compute = (n) => {
+    let results = all_inv_functions.map(x => x(n)).filter(x => x);
+    return results[randint(0, results.length)];
 }
 
-const divided_compute = (n) => {
-    // TODO do this with any factorization
-    // and any number of parts (use random up to log10?)
+const compute = (number, parts) => {
+    parts = randint(1, parts + 1);
 
-    // TODO support settings for multiple parts, allowing series, etc.
+    subresults = [];
 
-    if (n < 4) {
-        return [];
+    while (parts-- > 1) {
+        let term = randint(1, number / parts);
+        subresults.push(_compute(term));
+        number -= term;
+        console.log(subresults);
     }
 
-    if (n % 2 == 0) {
-        let halves = compute(n / 2);
-
-        return cartesian(halves, ['+'], halves).map(x => x.join(" "));
-    }
-
-    return [];
+    subresults.push(_compute(number));
+    return subresults.join(" + ");
 }
 
 // UI
@@ -104,15 +114,11 @@ const update = () => {
 
     const number = parseInt(datain.value);
 
-    let results_full = compute(number);
+    if (number < 1) {
+        dataout.innerText = "Bara positiva heltal (än så länge)";
+    }
 
-    let results_test = divided_compute(number);
-
-    let results = [...results_full, ...results_test];
-
-    console.log(results);
-
-    const result = results[Math.floor(Math.random() * results.length)]
+    const result = compute(number, 3);
     dataout.innerText = `$$${result}$$`;
     MathJax.typeset();
 }
