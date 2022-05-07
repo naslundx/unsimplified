@@ -37,9 +37,9 @@
             <p onclick="copy()" class="icon" id="copy"><i class="fa fa-copy"></i></p>
             <p class="icon" id="wolframalpha"><a href=""><i class="fa fa-external-link-square"></i></a></p>
         </div>
-        <p>Varför säga <input type="text" oninput="update()" onfocusin="focusin()" onfocusout="focusout()" placeholder="Skriv ett tal!"> när man kan säga...</h2>
+        <p>Varför säga <input type="text" oninput="update()" onfocusin="focusin()" onfocusout="focusout()" placeholder="123"> när man kan säga...</h2>
         
-        <p id="result">(skriv in ett heltal)</p>
+        <p id="result">...</p>
 
         <p id="raw" class="tex2jax_ignore"></p>
 
@@ -52,11 +52,17 @@
                 <input type="checkbox" id="complex" onchange="update()" checked>
                 <label for="complex">Komplexa uttryck</label>
             </div>
+            <!-- <div>
+                <input type="checkbox" id="descriptive" onchange="update()" checked>
+                <label for="descriptive">Beskrivningar</label>
+            </div> -->
         </div>
     </div>
 
     <div class="bounce">
-        <p>Tyckte du om det här?</p> 
+        <a onclick="closeBouncer()" class="close" title="Close"><i class="fa fa-window-close"></i></a>
+
+        <h2>Tyckte du om det här?</h2> 
         <p>Då gillar du kanske mina böcker också:</p>
 
         <div class="bouncecontent">

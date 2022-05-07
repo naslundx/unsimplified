@@ -6,12 +6,27 @@ const wabtn = document.querySelector("#wolframalpha");
 const copybtn = document.querySelector("#copy");
 const pref_multiple = document.querySelector("#multiterm");
 const pref_complex = document.querySelector("#complex");
+// const pref_descriptive = document.querySelector("#descriptive");
 const bounce = document.querySelector(".bounce");
 const raw = document.querySelector("#raw");
 
+// Randomness
+function Random(seed) {
+    this._seed = seed % 997;
+    if (this._seed <= 0) 
+        this._seed += 996;
+}
+
+Random.prototype.next = function(min, max) {
+    this._seed = this._seed * 67 % 997;
+    let r = (this._seed % (max - min)) + min;
+    return r;
+};
+
+var random = new Random(Math.floor(Math.random() * 10000 + 1));
+
 // Helper functions
 const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat()))).filter(x => x[0] != x[2]);
-const randint = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
 // Inverse functions
 const basel_inv = (n, prefs) => {
@@ -106,6 +121,8 @@ const simplethird_inv = (n, prefs) => {
     return "\\frac{" + (n * 3) + "}{3}"
 }
 
+
+
 const all_inv_functions = [
     basel_inv,
     two_three_inv,
@@ -121,23 +138,26 @@ const all_inv_functions = [
 // Computation functions
 const _compute = (n, prefs) => {
     let results = all_inv_functions.map(x => x(n, prefs)).filter(x => x);
-    return results[randint(0, results.length)];
+    return results[random.next(0, results.length)];
 }
 
 const compute = (number, parts, prefs) => {
-    if (prefs.multiterm === false || number < 3) {
+    if (prefs.multiterm === false) {
         parts = 1;
     } else {
-        parts = randint(1, parts + 1);
+        parts = random.next(1, parts + 1);
     }
 
     subresults = [];
 
     while (parts-- > 1) {
-        let term = randint(2, number / parts);
+        if (number / parts < 3) {
+            subresults.push(_compute(number, prefs));
+            break;
+        }
+        let term = random.next(2, Math.floor(number / parts));
         subresults.push(_compute(term, prefs));
         number -= term;
-        console.log(subresults);
     }
 
     subresults.push(_compute(number, prefs));
@@ -145,6 +165,10 @@ const compute = (number, parts, prefs) => {
 }
 
 // UI
+const closeBouncer = () => {
+    bounce.classList.add("hidden");
+}
+
 const focusin = () => {
     bounce.classList.add("hidden");
     setTimeout(focusout, 10000);
@@ -161,25 +185,29 @@ const update = () => {
 
     if (datain.value.length == 0) {
         dataout.innerText = "-";
+        raw.innerText = "-";
         return;
     }
 
     const number = parseInt(datain.value.trim());
-
-    console.log(number);
-    console.log(isNaN(number));
 
     if (isNaN(number) || number < 1) {
         dataout.innerText = "Bara positiva heltal (än så länge)";
         return;
     }
 
-    let prefs = {
+    const prefs = {
         complex: complex.checked,
-        multiterm: multiterm.checked
+        multiterm: multiterm.checked,
+        // descriptive: descriptive.checked
     }
 
-    console.log(prefs);
+    let newUrl = new URL(window.location.href);
+    newUrl.searchParams.set("q", number);
+    newUrl.searchParams.set("seed", random._seed);
+    console.log(newUrl.toString());
+    history.pushState(null, null, newUrl.toString());
+
     const result = compute(number, 3, prefs);
     wabtn.childNodes[0].href = "https://www.wolframalpha.com/input?i=" + encodeURIComponent(result);
     dataout.innerText = `$$${result}$$`;
@@ -200,18 +228,26 @@ const copy = () => {
     copyText.select();
     copyText.setSelectionRange(0, 99999); /* For mobile devices */
     
-        /* Copy the text inside the text field */
+    /* Copy the text inside the text field */
     navigator.clipboard.writeText(copyText.value);
     
     /* Alert the copied text */
     alert("Copied the text: " + copyText.value);
 }
 
+// Navigation
+let historyState = {};
+
 // Search
 const searchFromUrl = () => {
-    let searchterm = new URLSearchParams(window.location.search).get("q");
+    let params = new URLSearchParams(window.location.search);
+    let searchterm = params.get("q");
+    let seed = params.get("seed");
     if (searchterm) {
         datain.value = searchterm;
+        if (seed) {
+            random = new Random(seed);
+        }
         update();
     }
 }
