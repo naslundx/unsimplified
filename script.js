@@ -6,7 +6,6 @@ const wabtn = document.querySelector("#wolframalpha");
 const copybtn = document.querySelector("#copy");
 const pref_multiple = document.querySelector("#multiterm");
 const pref_complex = document.querySelector("#complex");
-// const pref_descriptive = document.querySelector("#descriptive");
 const bounce = document.querySelector(".bounce");
 const raw = document.querySelector("#raw");
 
@@ -25,23 +24,16 @@ Random.prototype.next = function(min, max) {
 
 var random = new Random(Math.floor(Math.random() * 10000 + 1));
 
-// Helper functions
-const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat()))).filter(x => x[0] != x[2]);
-
 // Inverse functions
 const basel_inv = (n, prefs) => {
-    if (!prefs.complex) {
-        return "";
-    }
-
     return "\\frac{" + (n * 6) + "}{\\pi^2}\\sum_{k=1}^{\\infty}\\frac{1}{k^2}";
 }
 
-const two_three_inv = (n, prefs) => {
-    if (!prefs.complex) {
-        return "";
-    }
+const basel2_inv = (n, prefs) => {
+    return "\\frac{" + (n * 90) + "}{\\pi^4}\\sum_{k=1}^{\\infty}\\frac{1}{k^4}";
+}
 
+const two_three_inv = (n, prefs) => {
     if (n >= 9 && n % 3 == 0) {
         const nthird = n / 3;
         return "\\sum_{k=1}^{\\infty}\\frac{" + nthird + "\\cdot k^2}{2^{k+1}}"
@@ -54,6 +46,23 @@ const two_three_inv = (n, prefs) => {
 
     return "";
 }
+
+const square_inv = (n, prefs) => {
+    if (Number.isInteger(Math.sqrt(n))) {
+        return Math.sqrt(n) + "^2";
+    }
+
+    return "";
+}
+
+const powerten_inv = (n, prefs) => {
+    if (Number.isInteger(Math.log10(n))) {
+        return "10^{" + Math.log10(n) + "}";
+    }
+
+    return "";
+}
+Math.log10
 
 const factorial_inv = (n, prefs) => {
     let product = 1;
@@ -70,13 +79,9 @@ const factorial_inv = (n, prefs) => {
 }
 
 const half_inv = (n, prefs) => {
-    if (!prefs.complex) {
-        return "";
-    }
-
     if (n % 2 == 0 && n > 2) {
         let nhalf = n / 2;
-        return "\\lim_{a->0^+}\\int_a^1\\frac{" + nhalf + "dx}{\\sqrt{x}}";
+        return "\\lim_{a \\rightarrow 0^+}\\int_a^1\\frac{" + nhalf + "dx}{\\sqrt{x}}";
     }
 
     return "";
@@ -91,6 +96,14 @@ const power_two_inv = (n, prefs) => {
     return "";
 }
 
+const sqrt_inv = (n, prefs) => {
+    if (n < 1) {
+        return "";
+    }
+
+    return "\\sqrt{" + n*n + "}";
+}
+
 const euler_inv = (n, prefs) => {
     if (!prefs.complex || n < 2) {
         return "";
@@ -100,11 +113,7 @@ const euler_inv = (n, prefs) => {
 }
 
 const tanprod_inv = (n, prefs) => {
-    if (!prefs.complex) {
-        return "";
-    }
-
-    if (n % 2 == 0) {
+    if (n % 2 == 0 || n < 3) {
         return "";
     }
 
@@ -121,23 +130,36 @@ const simplethird_inv = (n, prefs) => {
     return "\\frac{" + (n * 3) + "}{3}"
 }
 
-
+const ln_inv = (n, prefs) => {
+    return "\\ln\\left( \\sum_{k=0}^{\\infty} \\frac{" + n + "}{k!} \\right)"
+}
 
 const all_inv_functions = [
     basel_inv,
+    basel2_inv,
     two_three_inv,
     factorial_inv,
     half_inv,
+    square_inv,
     power_two_inv,
     euler_inv,
     tanprod_inv,
     simpledouble_inv,
     simplethird_inv,
+    ln_inv,
+    sqrt_inv,
+    powerten_inv,
 ];
 
 // Computation functions
 const _compute = (n, prefs) => {
     let results = all_inv_functions.map(x => x(n, prefs)).filter(x => x);
+    if (!prefs.complex) {
+        results = results.filter(x => !x.includes("\\sum"));
+        results = results.filter(x => !x.includes("\\lim"));
+        results = results.filter(x => !x.includes("\\int"));
+        results = results.filter(x => !x.includes("\\prod"));
+    }
     return results[random.next(0, results.length)];
 }
 
@@ -150,17 +172,20 @@ const compute = (number, parts, prefs) => {
 
     subresults = [];
 
-    while (parts-- > 1) {
+    while (parts-- > 0) {
+        console.log("a")
         if (number / parts < 3) {
             subresults.push(_compute(number, prefs));
+            console.log("subresults", subresults);
             break;
         }
+        console.log("b")
         let term = random.next(2, Math.floor(number / parts));
+        console.log(term);
         subresults.push(_compute(term, prefs));
         number -= term;
     }
 
-    subresults.push(_compute(number, prefs));
     return subresults.join(" + ");
 }
 
@@ -199,7 +224,6 @@ const update = () => {
     const prefs = {
         complex: complex.checked,
         multiterm: multiterm.checked,
-        // descriptive: descriptive.checked
     }
 
     let newUrl = new URL(window.location.href);
@@ -208,7 +232,7 @@ const update = () => {
     console.log(newUrl.toString());
     history.pushState(null, null, newUrl.toString());
 
-    const result = compute(number, 3, prefs);
+    const result = compute(number, 4, prefs);
     wabtn.childNodes[0].href = "https://www.wolframalpha.com/input?i=" + encodeURIComponent(result);
     dataout.innerText = `$$${result}$$`;
     refreshbtn.classList.add("visible");
@@ -223,20 +247,11 @@ const copy = () => {
     let copyText = document.createElement("input");
     copyText.type = "text";
     copyText.value = raw.innerText;
-
-    /* Select the text field */
     copyText.select();
-    copyText.setSelectionRange(0, 99999); /* For mobile devices */
-    
-    /* Copy the text inside the text field */
+    copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
-    
-    /* Alert the copied text */
-    alert("Copied the text: " + copyText.value);
+    alert("Kopierat till urklipp: " + copyText.value);
 }
-
-// Navigation
-let historyState = {};
 
 // Search
 const searchFromUrl = () => {
