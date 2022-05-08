@@ -164,10 +164,13 @@ const _compute = (n, prefs) => {
 }
 
 const compute = (number, parts, prefs) => {
+    let negative = number < 0;
+    number = Math.abs(number);
+
     if (prefs.multiterm === false) {
         parts = 1;
     } else {
-        parts = random.next(1, parts + 1);
+        parts = random.next(2, parts + 1);
     }
 
     subresults = [];
@@ -182,7 +185,9 @@ const compute = (number, parts, prefs) => {
         number -= term;
     }
 
-    return subresults.join(" + ");
+    const result = subresults.join(" + ");
+
+    return negative ? "-\\left(" + result + "\\right)" : result;
 }
 
 // UI
@@ -212,8 +217,9 @@ const update = () => {
 
     const number = parseInt(datain.value.trim());
 
-    if (isNaN(number) || number < 1) {
-        dataout.innerText = "Bara positiva heltal (än så länge)";
+    if (number.toString() != datain.value.trim()) {
+        dataout.innerText = "Bara heltal (än så länge!)";
+        raw.innerText = "-";
         return;
     }
 
