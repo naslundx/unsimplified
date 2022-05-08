@@ -173,15 +173,11 @@ const compute = (number, parts, prefs) => {
     subresults = [];
 
     while (parts-- > 0) {
-        console.log("a")
-        if (number / parts < 3) {
+        if (number / parts < 3 || parts == 0) {
             subresults.push(_compute(number, prefs));
-            console.log("subresults", subresults);
             break;
         }
-        console.log("b")
         let term = random.next(2, Math.floor(number / parts));
-        console.log(term);
         subresults.push(_compute(term, prefs));
         number -= term;
     }
@@ -229,7 +225,6 @@ const update = () => {
     let newUrl = new URL(window.location.href);
     newUrl.searchParams.set("q", number);
     newUrl.searchParams.set("seed", random._seed);
-    console.log(newUrl.toString());
     history.pushState(null, null, newUrl.toString());
 
     const result = compute(number, 4, prefs);
@@ -239,7 +234,6 @@ const update = () => {
     copybtn.classList.add("visible");
     wabtn.classList.add("visible");
     raw.innerText = result;
-    console.log(result);
     MathJax.typeset();
 }
 
