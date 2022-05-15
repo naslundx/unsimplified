@@ -204,7 +204,25 @@ const focusout = () => {
     bounce.classList.remove("hidden");
 }
 
+let writeTextFunc = null;
+const writeText = (newtext, wait) => {
+    dataout.classList.remove("lineup");
+    raw.classList.remove("lineup");
+    writeTextFunc = setTimeout(() => {
+        dataout.innerText = `$$${newtext}$$`;
+        MathJax.typeset();
+        raw.innerText = newtext;
+        dataout.classList.add("lineup");
+        raw.classList.add("lineup");
+    }, wait);
+}
+
 const update = () => {
+    if (writeTextFunc) {
+        clearTimeout(writeTextFunc);
+        writeTextFunc = null;
+    }
+
     refreshbtn.classList.remove("visible");
     wabtn.classList.remove("visible");
     copybtn.classList.remove("visible");
@@ -232,15 +250,14 @@ const update = () => {
     newUrl.searchParams.set("q", number);
     newUrl.searchParams.set("seed", random._seed);
     history.pushState(null, null, newUrl.toString());
-
     const result = compute(number, 4, prefs);
     wabtn.childNodes[0].href = "https://www.wolframalpha.com/input?i=" + encodeURIComponent(result);
-    dataout.innerText = `$$${result}$$`;
+    writeText(result, 750);
+
     refreshbtn.classList.add("visible");
     copybtn.classList.add("visible");
     wabtn.classList.add("visible");
-    raw.innerText = result;
-    MathJax.typeset();
+    
 }
 
 const copy = () => {

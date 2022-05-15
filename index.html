@@ -39,18 +39,16 @@
         </div>
         <p>Varför säga <input type="number" oninput="update()" onfocusin="focusin()" onfocusout="focusout()" placeholder="123"> när man kan säga...</h2>
         
-        <p id="result">...</p>
+        <p id="result" class="lineup">-</p>
 
-        <p id="raw" class="tex2jax_ignore"></p>
+        <p id="raw" class="tex2jax_ignore">-</p>
 
         <div class="settings">
             <div>
-                <input type="checkbox" id="multiterm" onchange="update()" checked>
-                <label for="multiterm">Flera termer</label>
+                <input type="checkbox" id="multiterm" onchange="update()" checked><label for="multiterm">Flera termer</label>
             </div>
             <div>
-                <input type="checkbox" id="complex" onchange="update()" checked>
-                <label for="complex">Komplexa uttryck</label>
+                <input type="checkbox" id="complex" onchange="update()" checked><label for="complex">Komplexa uttryck</label>
             </div>
             <!-- <div>
                 <input type="checkbox" id="descriptive" onchange="update()" checked>
